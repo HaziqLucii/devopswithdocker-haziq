@@ -1,0 +1,5 @@
+services:
+  devopsdockeruh-v2:
+    image: devopsdockeruh-v2:latest
+    ports:
+      - 8080:8080
