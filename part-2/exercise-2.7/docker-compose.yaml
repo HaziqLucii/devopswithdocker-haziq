@@ -1,0 +1,35 @@
+services:
+  backend:
+    image: example-backend:latest
+    ports:
+      - 8080:8080
+    environment:
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=haziq
+      - POSTGRES_PASSWORD=backend-root
+      - POSTGRES_DATABASE=backend_db
+    depends_on:
+      - db
+
+  frontend:
+    image: example-frontend:latest
+    ports:
+      - 5000:5000
+
+  redis:
+    image: redis
+
+  db:
+    image: postgres:13.2-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: haziq
+      POSTGRES_PASSWORD: backend-root
+      POSTGRES_DB: backend_db
+    volumes:
+      - database:/var/lib/postgresql/data
+    container_name: backend_db
+
+volumes:
+  database:

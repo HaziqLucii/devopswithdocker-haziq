@@ -1,0 +1,58 @@
+services:
+  web-server:
+    image: nginx:stable-alpine-otel
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 80:80
+    environment:
+      - NGINX_PORT=80
+    networks:
+      - fullstack
+
+  backend:
+    image: example-backend:latest
+    ports:
+      - 8080:8080
+    environment:
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=haziq
+      - POSTGRES_PASSWORD=backend-root
+      - POSTGRES_DATABASE=backend_db
+    networks:
+      - fullstack
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    image: example-frontend:latest
+    ports:
+      - 5000:5000
+    networks:
+      - fullstack
+
+  redis:
+    image: redis
+    networks:
+      - fullstack
+
+  db:
+    image: postgres:13.2-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: haziq
+      POSTGRES_PASSWORD: backend-root
+      POSTGRES_DB: backend_db
+    volumes:
+      - database:/var/lib/postgresql/data
+    container_name: backend_db
+    networks:
+      - fullstack
+
+volumes:
+  database:
+networks:
+  fullstack:
+    driver: bridge
